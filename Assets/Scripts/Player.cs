@@ -15,13 +15,18 @@ using Vector3 = UnityEngine.Vector3;
 public class Player : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed = 7f;
-    [SerializeField] private float _gravityForce = 0.6f;
+    [SerializeField] private float _acceleration = 5f;
+    private float _currentSpeed = 0f;
+    [SerializeField] public float _gravityForce = 0.6f;
     [SerializeField] private Inputs inputs;
     [SerializeField] private float rotateTime = 10f;
     [SerializeField] private bool _canMove = true;
     private Vector3 _moveDir;
+    [SerializeField] private GroundCollider _groundCollider;
     
-    private CharacterController _characterController;
+    private Vector3[] raycastOrigins = new Vector3[8];
+    
+    public CharacterController _characterController;
     
     public PlayerStateMachine _stateMachine;
     public PlayerMovingState _movingState;
@@ -35,13 +40,21 @@ public class Player : MonoBehaviour
         _movingState = new PlayerMovingState(this, _stateMachine);
         _fallingState = new PlayerFallingState(this, _stateMachine);
         
-        _characterController = GetComponent<CharacterController>();
         LevelController.RegisterPlayer(gameObject);
     }
     
     private void Start()
     {
-        _stateMachine.Initialize(_movingState);
+        _groundCollider = GetComponentInChildren<GroundCollider>();
+        _stateMachine.Initialize(_movingState);        
+        
+        for (int i = 0; i < 8; i++)
+        {
+            float angle = i * 45f; // 45 degrees between each raycast
+            Vector3 dir = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
+            raycastOrigins[i] = transform.position + Vector3.up * 0.5f + dir * 0.6f;
+            
+        }
     }
 
     private void OnDestroy()
@@ -50,29 +63,54 @@ public class Player : MonoBehaviour
     }
     
     private void Update()
-    {       
-        UpdateMovement();   
+    {
+        foreach (Vector3 origin in raycastOrigins)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position + origin, Vector3.down, out hit, 1f, LayerMask.GetMask("Terrain")))
+            {
+                Debug.Log(hit.collider.gameObject.name);
+            }
+        }
+        //UpdateMovement();   
+        _stateMachine.CurrentPlayerState.Update();
     }
 
-    private void ApplyGravity()
-    {
-        _canMove = _characterController.isGrounded;
-        _characterController.Move(Physics.gravity * Time.deltaTime * _gravityForce);
+    public bool isDetectingPlatform()
+    {    
+        foreach (Vector3 origin in raycastOrigins)
+        {
+            // Debug.DrawRay(transform.position + origin, transform.position + origin + Vector3.down * 500f, Color.red);
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position + origin, Vector3.down, out hit, 1f, LayerMask.GetMask("Terrain")))
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
-    private void UpdateMovement()
+    public void UpdateMovement()
     {
-        _canMove = _characterController.isGrounded;
-        
         _moveDir = CalculateMoveDir();
-        Vector3 gravityDir = Physics.gravity * Time.deltaTime * _gravityForce;
-        _characterController.Move(gravityDir);
-        float moveDistance = _moveSpeed * Time.deltaTime;
+        
+        if (_moveDir == Vector3.zero)
+        {
+            _currentSpeed = 0;
+            return;
+        }
+        
+        //Vector3 gravityDir = Physics.gravity * Time.deltaTime * _gravityForce;
+        // _characterController.Move(gravityDir);
+        
+        if (_currentSpeed < _moveSpeed) _currentSpeed += _acceleration * Time.deltaTime;
+        
+        float moveDistance = _currentSpeed * Time.deltaTime;
         
         var rotateDirection = new Vector3(transform.forward.x, 0, transform.forward.z);
         transform.forward = Vector3.Slerp(rotateDirection, _moveDir, Time.deltaTime * rotateTime);
-        
-        _characterController.Move(_moveDir * moveDistance);
+
+        _characterController.Move(_moveDir * moveDistance);// + gravityDir);
     }
     
     public Vector3 CalculateMoveDir()

@@ -64,12 +64,12 @@ public class ColorController : MonoBehaviour
     {
         if (_litColors.Count == 0)
         {
-            Debug.Log("Main light is on");
+            //Debug.Log("Main light is on");
             _mainLight.gameObject.GetComponent<Light>().intensity = 1f;
         }
         else
         {
-            Debug.Log("Main light is off");
+            //Debug.Log("Main light is off");
             _mainLight.gameObject.GetComponent<Light>().intensity = 0.3f;
         }
     }

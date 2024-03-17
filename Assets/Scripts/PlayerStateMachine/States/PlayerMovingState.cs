@@ -4,18 +4,21 @@ using UnityEngine;
 
 public class PlayerMovingState : PlayerState
 {
+    private Vector3 _moveDir;
     public PlayerMovingState(Player player, PlayerStateMachine playerStateMachine) : base(player, playerStateMachine)
     {
     }
-
-    public override void EnterState()
+    
+    public override void Update()
     {
-        base.EnterState();
+        player.UpdateMovement();
+        
+        if (!player._characterController.isGrounded && !player.isDetectingPlatform())
+        {
+            player._stateMachine.ChangePlayerState(player._fallingState);
+        }
     }
+    
 
-    public override void ExitState()
-    {
-        base.ExitState();
-    }
 }
 

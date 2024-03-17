@@ -18,7 +18,7 @@ public class InteractableButton : MonoBehaviour, IInteractable
     
     public void Interact()
     {
-        Debug.Log("Interacted with " + interactableObject.name);
+        //Debug.Log("Interacted with " + interactableObject.name);
         switch (_isOn)
         {
             case false:
@@ -31,5 +31,15 @@ public class InteractableButton : MonoBehaviour, IInteractable
                 break;
         }
         
+    }
+    
+    private void Awake()
+    {
+        AllInteractablesController.Register(this);
+    }
+    
+    private void OnDestroy()
+    {
+        AllInteractablesController.Unregister(this);
     }
 }

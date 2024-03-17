@@ -306,8 +306,8 @@
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Signals\SignalAssetInspector.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Window\TimelineWindow_PlayRange.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\inspectors\TimelineProjectSettings.cs" />
-     <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Activation\ActivationTrackEditor.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Utilities\Scopes\GUIViewportScope.cs" />
+     <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Activation\ActivationTrackEditor.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Signals\SignalEmitterEditor.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Manipulators\Utils\EditModeGUIUtils.cs" />
      <Compile Include="Library\PackageCache\com.unity.timeline@1.7.4\Editor\Window\TimelineWindow_Gui.cs" />
