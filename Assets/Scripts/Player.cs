@@ -46,7 +46,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         _groundCollider = GetComponentInChildren<GroundCollider>();
-        _stateMachine.Initialize(_movingState);        
+        _stateMachine.Initialize(_fallingState);        
         
         for (int i = 0; i < 8; i++)
         {
@@ -64,30 +64,24 @@ public class Player : MonoBehaviour
     
     private void Update()
     {
-        foreach (Vector3 origin in raycastOrigins)
-        {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position + origin, Vector3.down, out hit, 1f, LayerMask.GetMask("Terrain")))
-            {
-                Debug.Log(hit.collider.gameObject.name);
-            }
-        }
         //UpdateMovement();   
         _stateMachine.CurrentPlayerState.Update();
     }
 
-    public bool isDetectingPlatform()
+    public int howManyDetectingEdge()
     {    
+        int final = 0;
         foreach (Vector3 origin in raycastOrigins)
         {
             // Debug.DrawRay(transform.position + origin, transform.position + origin + Vector3.down * 500f, Color.red);
             RaycastHit hit;
-            if (Physics.Raycast(transform.position + origin, Vector3.down, out hit, 1f, LayerMask.GetMask("Terrain")))
+            if (Physics.Raycast(transform.position + origin, Vector3.down, out hit, 3f, LayerMask.GetMask("Terrain")))
             {
-                return true;
+                final++;
             }
         }
-        return false;
+
+        return final;
     }
     
     public void UpdateMovement()
@@ -99,8 +93,16 @@ public class Player : MonoBehaviour
             _currentSpeed = 0;
             return;
         }
-        
-        //Vector3 gravityDir = Physics.gravity * Time.deltaTime * _gravityForce;
+
+        Vector3 gravityDir = new();
+        if (howManyDetectingEdge() < 8)
+        {
+            gravityDir = Vector3.zero;
+        }
+        else
+        {
+            gravityDir = Physics.gravity * Time.deltaTime * _gravityForce;
+        }
         // _characterController.Move(gravityDir);
         
         if (_currentSpeed < _moveSpeed) _currentSpeed += _acceleration * Time.deltaTime;
@@ -110,7 +112,7 @@ public class Player : MonoBehaviour
         var rotateDirection = new Vector3(transform.forward.x, 0, transform.forward.z);
         transform.forward = Vector3.Slerp(rotateDirection, _moveDir, Time.deltaTime * rotateTime);
 
-        _characterController.Move(_moveDir * moveDistance);// + gravityDir);
+        _characterController.Move(_moveDir * moveDistance + gravityDir);
     }
     
     public Vector3 CalculateMoveDir()
@@ -122,6 +124,7 @@ public class Player : MonoBehaviour
 
         Vector3 moveDir = new Vector3(Xdir, 0, Ydir);
         
+        moveDir = new Vector3(moveDir.x, moveDir.y, moveDir.z*Mathf.Cos(Mathf.Deg2Rad * 30));
         moveDir = Quaternion.Euler(0, 45, 0) * moveDir;
         
         return moveDir.normalized;

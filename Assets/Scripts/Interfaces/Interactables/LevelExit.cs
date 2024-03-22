@@ -20,6 +20,6 @@ public class LevelExit : MonoBehaviour, IInteractable
     public GameObject interactableObject { get; set; }
     public void Interact()
     {
-        throw new System.NotImplementedException();
+        Debug.Log("Level Complete");
     }
 }

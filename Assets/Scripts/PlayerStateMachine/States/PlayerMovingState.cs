@@ -13,7 +13,7 @@ public class PlayerMovingState : PlayerState
     {
         player.UpdateMovement();
         
-        if (!player._characterController.isGrounded && !player.isDetectingPlatform())
+        if (!player._characterController.isGrounded && player.howManyDetectingEdge() == 0)
         {
             player._stateMachine.ChangePlayerState(player._fallingState);
         }
