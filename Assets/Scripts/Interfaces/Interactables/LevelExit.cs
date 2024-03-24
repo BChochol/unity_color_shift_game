@@ -1,25 +1,26 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class LevelExit : MonoBehaviour, IInteractable
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+public class LevelExit : MonoBehaviour{
 
-    // Update is called once per frame
-    void Update()
+    Collider _collider;
+    
+    private void Start()
     {
-        
+        _collider = GetComponent<Collider>();
     }
-
-    public GameObject interactableObject { get; set; }
-    public void Interact()
+    private void OnTriggerStay(Collider other)
     {
-        Debug.Log("Level Complete");
+        if (other.gameObject.tag == "Player")
+        {
+            if (_collider.bounds.Contains(other.bounds.max) && _collider.bounds.Contains(other.bounds.min))
+            {
+                Debug.Log("Gracz jes");
+            }
+        }
     }
+    
 }

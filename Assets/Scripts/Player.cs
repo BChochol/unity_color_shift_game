@@ -129,4 +129,5 @@ public class Player : MonoBehaviour
         
         return moveDir.normalized;
     }
+
 }
